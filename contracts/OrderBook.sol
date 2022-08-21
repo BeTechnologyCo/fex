@@ -297,6 +297,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
 
     function _sellTranfer(Order storage order, uint256 amount) private {
         if (order.toETH) {
+            WETH.withdraw(amount);
             TransferHelper.safeTransferETH(order.trader, amount);
         } else {
             uint256 balanceBefore = IERC20(order.tokenToBuy).balanceOf(
@@ -315,7 +316,11 @@ contract OrderBook is Ownable, AccessControlEnumerable {
     }
 
     function _rewardTrader(Order storage order) private {
-        if (order.feeAmount > 0) {
+        if (
+            order.tokenToBuy != address(nativeToken) &&
+            order.tokenToSell != address(nativeToken) &&
+            order.feeAmount > 0
+        ) {
             uint256 reward = rewardfee(order.feeAmount);
             if (reward > 0) {
                 nativeToken.transfer(order.trader, reward);
@@ -357,6 +362,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
         uint256 amount = order.amountToSell - order.amountToSellCompleted;
 
         if (order.fromETH) {
+            WETH.withdraw(amount);
             TransferHelper.safeTransferETH(order.trader, amount);
         } else {
             TransferHelper.safeTransfer(order.tokenToBuy, order.trader, amount);
