@@ -31,8 +31,8 @@ describe('Order test', () => {
     });
 
 
-    it("create order", async () => {
-        orderBook.createOrder(nativeToken.address, WETH.address, initialSupply.div(10), oneToken, true);
+    it("match order", async () => {
+        await orderBook.createOrder(nativeToken.address, WETH.address, initialSupply.div(10), oneToken, true);
     });
 
 

@@ -35,8 +35,8 @@ contract OrderBook is Ownable, AccessControlEnumerable {
         address tokenToSell;
         address tokenToBuy;
         uint256 timestamp;
-        bool fromWETH;
-        bool toWETH;
+        bool fromETH;
+        bool toETH;
     }
 
     OrderDexToken public immutable nativeToken;
@@ -99,12 +99,11 @@ contract OrderBook is Ownable, AccessControlEnumerable {
     /**
      * @notice Creates an order, transfering into th
      */
-    function createOrderFromETH(
-        address tokenToBuy,
-        uint256 amountToSell,
-        uint256 amountToBuy
-    ) external payable {
-        require(amountToSell > 0, "You need to sell more than 0 token");
+    function createOrderFromETH(address tokenToBuy, uint256 amountToBuy)
+        external
+        payable
+    {
+        require(msg.value > 0, "You need to sell more than 0 token");
         require(amountToBuy > 0, "You need to buy more than 0 token");
 
         IWETH(WETH).deposit{value: msg.value}();
@@ -124,7 +123,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
             id: orderCount,
             feeAmount: creationFee,
             status: OrderStatus.Active,
-            amountToSell: amountToSell,
+            amountToSell: msg.value,
             amountToBuy: amountToBuy,
             amountToSellCompleted: 0,
             amountToBuyCompleted: 0,
@@ -132,8 +131,8 @@ contract OrderBook is Ownable, AccessControlEnumerable {
             tokenToBuy: tokenToBuy,
             trader: _msgSender(),
             timestamp: block.timestamp,
-            fromWETH: true,
-            toWETH: false
+            fromETH: true,
+            toETH: false
         });
 
         emit OrderAdded(orderCount, _msgSender(), orders[orderCount]);
@@ -149,12 +148,12 @@ contract OrderBook is Ownable, AccessControlEnumerable {
         address tokenToBuy,
         uint256 amountToSell,
         uint256 amountToBuy,
-        bool toWETH
+        bool toETH
     ) external {
         require(amountToSell > 0, "You need to sell more than 0 token");
         require(amountToBuy > 0, "You need to buy more than 0 token");
 
-        if (toWETH) {
+        if (toETH) {
             require(tokenToBuy == address(WETH), "Wrong weth address");
         }
 
@@ -172,11 +171,21 @@ contract OrderBook is Ownable, AccessControlEnumerable {
             );
         }
 
+        uint256 balanceBefore = IERC20(tokenToSell).balanceOf(address(this));
+
         TransferHelper.safeTransferFrom(
             tokenToSell,
             _msgSender(),
             address(this),
             amountToSell
+        );
+
+        uint256 balanceAfter = IERC20(tokenToSell).balanceOf(address(this));
+
+        // todo support fee token
+        require(
+            balanceAfter - balanceBefore >= amountToSell,
+            "Didn't support tax token"
         );
 
         // Create the order
@@ -192,8 +201,8 @@ contract OrderBook is Ownable, AccessControlEnumerable {
             tokenToBuy: tokenToBuy,
             trader: _msgSender(),
             timestamp: block.timestamp,
-            fromWETH: false,
-            toWETH: toWETH
+            fromETH: false,
+            toETH: toETH
         });
 
         emit OrderAdded(orderCount, _msgSender(), orders[orderCount]);
@@ -245,28 +254,12 @@ contract OrderBook is Ownable, AccessControlEnumerable {
 
             uint256 amountFromAToB = amountTransfered / priceByTokenA;
 
-            if (orderA.toWETH) {
-                TransferHelper.safeTransferETH(orderA.trader, amountTransfered);
-            } else {
-                TransferHelper.safeTransfer(
-                    orderA.tokenToBuy,
-                    orderA.trader,
-                    amountTransfered
-                );
-            }
+            _sellTranfer(orderA, amountTransfered);
 
             orderA.amountToBuyCompleted += amountTransfered;
             orderB.amountToSellCompleted += amountTransfered;
 
-            if (orderB.toWETH) {
-                TransferHelper.safeTransferETH(orderB.trader, amountTransfered);
-            } else {
-                TransferHelper.safeTransfer(
-                    orderB.tokenToBuy,
-                    orderB.trader,
-                    amountFromAToB
-                );
-            }
+            _sellTranfer(orderB, amountFromAToB);
 
             orderA.amountToSellCompleted += amountFromAToB;
             orderB.amountToBuyCompleted += amountFromAToB;
@@ -299,6 +292,25 @@ contract OrderBook is Ownable, AccessControlEnumerable {
                 _rewardTrader(orderA);
                 return;
             }
+        }
+    }
+
+    function _sellTranfer(Order storage order, uint256 amount) private {
+        if (order.toETH) {
+            TransferHelper.safeTransferETH(order.trader, amount);
+        } else {
+            uint256 balanceBefore = IERC20(order.tokenToBuy).balanceOf(
+                order.trader
+            );
+            TransferHelper.safeTransfer(order.tokenToBuy, order.trader, amount);
+            uint256 balanceAfter = IERC20(order.tokenToBuy).balanceOf(
+                order.trader
+            );
+            // todo support tax token
+            require(
+                balanceAfter - balanceBefore >= amount,
+                "Didn't support tax token"
+            );
         }
     }
 
@@ -344,7 +356,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
 
         uint256 amount = order.amountToSell - order.amountToSellCompleted;
 
-        if (order.fromWETH) {
+        if (order.fromETH) {
             TransferHelper.safeTransferETH(order.trader, amount);
         } else {
             TransferHelper.safeTransfer(order.tokenToBuy, order.trader, amount);
