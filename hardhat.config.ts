@@ -11,6 +11,7 @@ const privateKey = process.env.PRIVATE_KEY || "";
 const privateKey2 = process.env.PRIVATE_KEY2 || "";
 const privateKey3 = process.env.PRIVATE_KEY3 || "";
 const privateKey4 = process.env.PRIVATE_KEY4 || "";
+const deployerKey = process.env.DEPLOYER_KEY || "";
 
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -62,6 +63,10 @@ const config: HardhatUserConfig = {
             privateKey4,
         },
       ],
+    },
+    matic: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts: [deployerKey]
     }
 
   },

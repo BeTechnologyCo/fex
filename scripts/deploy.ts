@@ -1,18 +1,15 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const [deployer] = await ethers.getSigners();
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const initialSupply = ethers.utils.parseUnits("10000", 18);
+  const nativeToken = await deployContract("OrderDexToken", initialSupply);
+  const orderBook = await deployContract("OrderBook", nativeToken.address, "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889");
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  console.log(`native token address ${nativeToken.address}`);
+  console.log(`order book address ${orderBook.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -21,3 +18,11 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+async function deployContract(name: string, ...constructorArgs: any[]): Promise<any> {
+  const factory = await ethers.getContractFactory(name);
+  const contract = await factory.deploy(...constructorArgs);
+  await contract.deployed();
+  return contract;
+}
+
