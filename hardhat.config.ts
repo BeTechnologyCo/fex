@@ -42,6 +42,9 @@ const config: HardhatUserConfig = {
         auto: true,
         interval: 5000
       },
+      forking: {
+        url: "https://rpc-mumbai.maticvigil.com",
+      },
       accounts: [
         {
           balance: "100000000000000000000",
