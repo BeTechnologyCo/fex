@@ -108,6 +108,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
 
         IWETH(WETH).deposit{value: msg.value}();
 
+        uint256 fee = 0;
         // no fee on native token
         if (creationFee > 0 && tokenToBuy != address(nativeToken)) {
             TransferHelper.safeTransferFrom(
@@ -116,12 +117,13 @@ contract OrderBook is Ownable, AccessControlEnumerable {
                 address(this),
                 creationFee
             );
+            fee = creationFee;
         }
 
         // Create the order
         orders[orderCount] = Order({
             id: orderCount,
-            feeAmount: creationFee,
+            feeAmount: fee,
             status: OrderStatus.Active,
             amountToSell: msg.value,
             amountToBuy: amountToBuy,
@@ -157,6 +159,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
             require(tokenToBuy == address(WETH), "Wrong weth address");
         }
 
+        uint256 fee = 0;
         // no fee on native token
         if (
             creationFee > 0 &&
@@ -169,6 +172,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
                 address(this),
                 creationFee
             );
+            fee = creationFee;
         }
 
         uint256 balanceBefore = IERC20(tokenToSell).balanceOf(address(this));
@@ -191,7 +195,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
         // Create the order
         orders[orderCount] = Order({
             id: orderCount,
-            feeAmount: creationFee,
+            feeAmount: fee,
             status: OrderStatus.Active,
             amountToSell: amountToSell,
             amountToBuy: amountToBuy,
