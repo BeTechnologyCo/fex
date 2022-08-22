@@ -19,5 +19,5 @@
     "@openzeppelin/contracts": "^4.7.3",
     "dotenv": "^16.0.1"
   },
-  "license": "BUSL-1.1",
+  "license": "BUSL-1.1"
 }
