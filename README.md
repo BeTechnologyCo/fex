@@ -38,3 +38,7 @@ npx hardhat run scripts/deploy.ts --network matic
 Native token address (mumbai) : 0x5bd8391CBC43eE396F5614A517691C7d08268333
 
 Order Book address (mumbai) : 0xB79aF1F3dD7e25Da902363ef5E220470b9288021
+
+## Licensing
+
+The primary license for Uniswap V3 Core is the Business Source License 1.1 (BUSL-1.1), see LICENSE. However, some files are dual licensed under GPL-2.0-or-later
