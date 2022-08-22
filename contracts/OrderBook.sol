@@ -244,7 +244,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
                 orderB.amountToSellCompleted;
             require(amountToSellB > 0, "Not enough token in the order B");
 
-            uint256 priceByTokenB = orderB.amountToSell / orderA.amountToBuy;
+            uint256 priceByTokenB = orderB.amountToSell / orderB.amountToBuy;
             require(priceByTokenA >= priceByTokenB, "Price to high");
 
             uint256 amountTransfered = amountToBuyA;

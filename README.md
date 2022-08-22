@@ -37,7 +37,7 @@ npx hardhat run scripts/deploy.ts --network matic
 
 Native token address (mumbai) : 0x5bd8391CBC43eE396F5614A517691C7d08268333
 
-Order Book address (mumbai) : 0xB79aF1F3dD7e25Da902363ef5E220470b9288021
+Order Book address (mumbai) : 0x4Ef296cB9a061d1a7285A08D2252F82Ef3082071
 
 ## Licensing
 
