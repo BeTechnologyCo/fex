@@ -337,7 +337,7 @@ contract OrderBook is Ownable, AccessControlEnumerable {
     }
 
     /**
-     * @notice Cancels a currently listed order, returning the BREWERY to the owner
+     * @notice Cancels a currently listed order
      */
     function cancelOrder(uint256 orderId) external payable {
         Order storage order = orders[orderId];

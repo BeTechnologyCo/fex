@@ -28,16 +28,16 @@ DEPLOYER_KEY = 0xaaaaaaaaa....
 npx hardhat node
 
 npx hardhat run scripts/deploy.ts
-## Deploy on  mumbai
-To deploy in mumbai or local node add deployer key on .env file and execute script
+## Deploy on fantom testnet
+To deploy in fantom testnet or local node add deployer key on .env file and execute script
 
 DEPLOYER_KEY = 0xaaaaaaaaa....
 
-npx hardhat run scripts/deploy.ts --network matic
+npx hardhat run scripts/deploy.ts --network testnet
 
-Native token address (mumbai) : 0x5bd8391CBC43eE396F5614A517691C7d08268333
+Native token address (testnet) : 0x5bd8391CBC43eE396F5614A517691C7d08268333
 
-Order Book address (mumbai) : 0x1fb496CDD6e00EE72c775263FFb34c1401bC5CfC
+Order Book address (testnet) : 0x1fb496CDD6e00EE72c775263FFb34c1401bC5CfC
 
 ## Licensing
 

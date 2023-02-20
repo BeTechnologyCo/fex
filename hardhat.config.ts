@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
         interval: 5000
       },
       forking: {
-        url: "https://rpc-mumbai.maticvigil.com",
+        url: "https://rpc.testnet.fantom.network",
       },
       accounts: [
         {
@@ -67,8 +67,8 @@ const config: HardhatUserConfig = {
         },
       ],
     },
-    matic: {
-      url: "https://rpc-mumbai.maticvigil.com",
+    testnet: {
+      url: "https://rpc.testnet.fantom.network",
       accounts: [deployerKey]
     }
 

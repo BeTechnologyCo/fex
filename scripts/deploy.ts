@@ -2,10 +2,15 @@ import { ethers } from "hardhat";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
+  let wFTM = "0xf1277d1ed8ad466beddf92ef448a132661956621";
+  const { chainId } = await ethers.provider.getNetwork();
+  if (chainId === 250) {
+    wFTM = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
+  }
 
   const initialSupply = ethers.utils.parseUnits("10000", 18);
   const nativeToken = await deployContract("OrderDexToken", initialSupply);
-  const orderBook = await deployContract("OrderBook", nativeToken.address, "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889");
+  const orderBook = await deployContract("OrderBook", nativeToken.address, wFTM);
 
 
   console.log(`native token address ${nativeToken.address}`);
